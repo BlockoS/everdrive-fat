@@ -20,19 +20,82 @@
 * 	
 */
 
+#if 0
 dec_int32(int32_result)
 char*	int32_result;
 {
 	/* Decrement (in-place) a 32bit number */
 	if (int32_result[3]--==0) if(int32_result[2]--==0) if (int32_result[1]--==0) --int32_result[0];
 }
+#else
+#asm
+    .proc _dec_int32
+        ldy    #3
+        stx    <__ptr
+        sta    <__ptr+1
+        
+        sec
+        lda    [__ptr], y
+        sbc    #$01
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        sbc    #$00
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        sbc    #$00
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        sbc    #$00
+        sta    [__ptr], y
+    
+    rts
+    .endp
+#endasm
+#endif
 
+#if 0
 inc_int32(int32_result)
 char*	int32_result;
 {
 	/* Increment (in-place) a 32bit number */
-	if (int32_result[3]++==0) if(int32_result[2]++==0) if (int32_result[1]++==0) ++int32_result[0];
+	 if (int32_result[3]++==0) if(int32_result[2]++==0) if (int32_result[1]++==0) ++int32_result[0]; 
 }
+#else 
+#asm
+    .proc _inc_int32
+        ldy    #3
+        stx    <__ptr
+        sta    <__ptr+1
+        
+        clc
+        lda    [__ptr], y
+        adc    #$01
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        adc    #$00
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        adc    #$00
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        adc    #$00
+        sta    [__ptr], y    
+    rts
+    .endp
+#endasm
+#endif
 
 lt_int32(int32_a, int32_b)
 char*	int32_a;
@@ -100,6 +163,7 @@ char*	int32_b;
 	return 1;
 }
 
+#if 0
 shift_int32(int32_result)
 char*	int32_result;
 {
@@ -113,3 +177,32 @@ char*	int32_result;
 		in = out;
 	}
 }
+#else
+#asm
+    .proc _shift_int32
+        ldy    #3
+        stx    <__ptr
+        sta    <__ptr+1
+        
+        lda    [__ptr], y
+        asl    A
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        rol    A
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        rol    A
+        sta    [__ptr], y
+        
+        dey
+        lda    [__ptr], y
+        rol    A
+        sta    [__ptr], y
+    rts
+    .endp
+#endasm
+#endif

@@ -42,7 +42,7 @@
 * zero_int32()		- Initialises a 4byte packed 32bit number (sets each memory location to 0x00)
 */
 
-#include "math32-extras.h"
+//#include "math32-extras.h"
 
 int32_to_int16_lsb(int32)
 char*	int32;
@@ -75,6 +75,7 @@ char 	int8;
 	int32_result[3] = int8;
 }
 
+#if 0
 int16_to_int32(int32_result, int16)
 char* 	int32_result;
 int	int16;
@@ -89,8 +90,41 @@ int	int16;
 	int32_result[2] = int16 >> 8;
 	int32_result[3] = int16 & 0xff;
 }
+#else
+#asm
+    .proc _int16_to_int32
+        pha
+        phx
+        
+        lda    [__sp]
+        sta    <__ptr
+        ldy    #1
+        lda    [__sp], Y
+        sta    <__ptr+1
+        
+        cly
+        cla
+        
+        sta    [__ptr], Y
+        
+        iny
+        sta    [__ptr], Y
+        
+        iny
+        pla
+        sta    [__ptr], Y
+        
+        iny
+        pla
+        sta    [__ptr], Y
+        
+        __addmi 2,__stack
+    rts
+    .endp
+#endasm
+#endif
 
-
+#if 0
 int32_is_zero(int32)
 char* 	int32;
 {
@@ -103,6 +137,38 @@ char* 	int32;
 	
 	return 0;
 }
+#else
+#asm
+    .proc _int32_is_zero
+        cly
+        stx    <__ptr
+        sta    <__ptr+1
+        
+        lda    [__ptr], Y
+        bne    .l0
+
+        iny
+        lda    [__ptr], Y
+        bne    .l0
+
+        iny
+        lda    [__ptr], Y
+        bne    .l0
+
+        iny
+        lda    [__ptr], Y
+        bne    .l0
+    
+        ldx    #1
+        cla
+    rts
+.l0:
+        clx
+        cla
+    rts
+    .endp
+#endasm
+#endif
 
 mul_int32(int32_result, int32_a, int32_b)
 char* 	int32_result;
@@ -285,6 +351,7 @@ char	power;
 	}
 }
 
+#if 0
 zero_int32(int32_result)
 char*	int32_result;
 {
@@ -295,7 +362,30 @@ char*	int32_result;
 	int32_result[2] = 0x00;
 	int32_result[3] = 0x00;
 }
+#else
+#asm
+    .proc _zero_int32
+        cly
+        stx    <__ptr
+        sta    <__ptr+1
+        
+        cla
+        sta    [__ptr], Y
+        
+        iny
+        sta    [__ptr], Y
+        
+        iny
+        sta    [__ptr], Y
+        
+        iny
+        sta    [__ptr], Y
+    rts
+    .endp
+#endasm
+#endif
 
+#if 0
 copy_int32(int32_result, int32)
 char*	int32_result;
 char*	int32;
@@ -304,3 +394,36 @@ char*	int32;
 	
 	memcpy(int32_result, int32, 4);
 }
+#else
+#asm
+    .proc _copy_int32
+        stx    <_si
+        sta    <_si+1
+        
+        lda    [__sp]
+        sta    <_di
+        ldy    #1
+        lda    [__sp], Y
+        sta    <_di+1
+        
+        cly
+        lda    [_si], Y
+        sta    [_di], Y
+        
+        iny
+        lda    [_si], Y
+        sta    [_di], Y
+        
+        iny
+        lda    [_si], Y
+        sta    [_di], Y
+
+        iny
+        lda    [_si], Y
+        sta    [_di], Y
+
+        __addmi 2,__stack
+    rts
+    .endp
+#endasm
+#endif
